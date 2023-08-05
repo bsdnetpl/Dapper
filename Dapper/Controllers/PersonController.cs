@@ -54,7 +54,40 @@ namespace ApiDapper.Controllers
             {
                 var createdPerson = await _personServices.CreatePerson(personDto);
                 return Ok(createdPerson);
-                //return CreatedAtRoute("CompanyById", new { id = createdCompany.Id }, createdCompany);
+            }
+            catch (Exception ex)
+            {
+                //log error
+                return StatusCode(500, ex.Message);
+            }
+        }
+        [HttpPut("UbdatePerson")]
+        public async Task<ActionResult> UpdatePerson(Guid id, PersonUpdateDto personUpdateDto)
+        {
+            try
+            {
+                var dbCompany = await _personServices.GetPersonById(id);
+                if (dbCompany == null)
+                    return NotFound();
+                await _personServices.UpdatePerson(id, personUpdateDto);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                //log error
+                return StatusCode(500, ex.Message);
+            }
+        }
+        [HttpDelete("DeletePerson")]
+        public async Task<ActionResult> DeletePerson(Guid id)
+        {
+            try
+            {
+                var dbCompany = await _personServices.GetPersonById(id);
+                if (dbCompany == null)
+                    return NotFound();
+                await _personServices.DeletePerson(id);
+                return NoContent();
             }
             catch (Exception ex)
             {
