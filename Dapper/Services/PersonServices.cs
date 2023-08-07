@@ -61,8 +61,8 @@ namespace ApiDapper.Services
             var query = "SELECT * FROM Person WHERE FirstName = @FirstName";
             using (var connection = _context.CreateConnection())
             {
-                var company = await connection.QuerySingleOrDefaultAsync<Person>(query, new { FirstName });
-                return company;
+                var person = await connection.QuerySingleOrDefaultAsync<Person>(query, new { FirstName });
+                return person;
             }
         }
 
