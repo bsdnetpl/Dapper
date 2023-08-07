@@ -66,7 +66,7 @@ namespace ApiDapper.Services
             }
         }
 
-        public async Task UpdatePerson(Guid id, PersonUpdateDto personUpdateDto)
+        public async Task<bool> UpdatePerson(Guid id, PersonUpdateDto personUpdateDto)
         {
             var query = "UPDATE Person SET FirstName = @FirstName, LastName = @LastName, Email = @Email , Password = @Password WHERE Id = @Id";
             var parameters = new DynamicParameters();
@@ -82,15 +82,17 @@ namespace ApiDapper.Services
             {
                 await connection.ExecuteAsync(query, parameters);
             }
+            return true;
         }
 
-        public async Task DeletePerson(Guid id)
+        public async Task<bool> DeletePerson(Guid id)
         {
             var query = "DELETE FROM Person WHERE Id = @Id";
             using (var connection = _context.CreateConnection())
             {
                 await connection.ExecuteAsync(query, new { id });
             }
+            return true;
         }
 
         public async Task<Person> GetPersonById(Guid id)
@@ -98,8 +100,8 @@ namespace ApiDapper.Services
             var query = "SELECT * FROM Person WHERE Id = @id";
             using (var connection = _context.CreateConnection())
             {
-                var company = await connection.QuerySingleOrDefaultAsync<Person>(query, new { id });
-                return company;
+                var person = await connection.QuerySingleOrDefaultAsync<Person>(query, new { id });
+                return person;
             }
         }
     }
