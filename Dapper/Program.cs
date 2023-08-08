@@ -1,6 +1,8 @@
 using ApiDapper.DB;
+using ApiDapper.Models;
 using ApiDapper.Services;
 using Dapper.Models;
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +16,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<DapperContext>();
 builder.Services.AddScoped<IPersonServices, PersonServices>();
 builder.Services.AddScoped<IPasswordHasher<Person>, PasswordHasher<Person>>();
+builder.Services.AddValidatorsFromAssemblyContaining<PersonValidatorDto>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

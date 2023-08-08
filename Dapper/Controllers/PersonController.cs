@@ -1,7 +1,11 @@
 ﻿using ApiDapper.Models;
 using ApiDapper.Services;
+using Dapper.Models;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace ApiDapper.Controllers
 {
@@ -10,10 +14,15 @@ namespace ApiDapper.Controllers
     public class PersonController : ControllerBase
     {
         private readonly IPersonServices _personServices;
+        private readonly IValidator<Person> _validator;
+        private readonly IValidator<PersonDto> _validatorDto;
 
-        public PersonController(IPersonServices personServices)
+
+        public PersonController(IPersonServices personServices, IValidator<Person> validator, IValidator<PersonDto> validatorDto)
         {
             _personServices = personServices;
+            _validator = validator;
+            _validatorDto = validatorDto;
         }
 
         [HttpGet]
@@ -50,16 +59,22 @@ namespace ApiDapper.Controllers
         [HttpPost("AddPerson")]
         public async Task<ActionResult> AddPerson(PersonDto personDto)
         {
-            try
+            ValidationResult result = await _validatorDto.ValidateAsync(personDto);
+            if (result.IsValid)
             {
-                var createdPerson = await _personServices.CreatePerson(personDto);
-                return Ok(createdPerson);
+
+                try
+                {
+                    var createdPerson = await _personServices.CreatePerson(personDto);
+                    return Ok(createdPerson);
+                }
+                catch (Exception ex)
+                {
+                    //log error
+                    return StatusCode(500, ex.Message);
+                }
             }
-            catch (Exception ex)
-            {
-                //log error
-                return StatusCode(500, ex.Message);
-            }
+            return BadRequest(result);
         }
         [HttpPut("UbdatePerson")]
         public async Task<ActionResult> UpdatePerson(Guid id, PersonUpdateDto personUpdateDto)
